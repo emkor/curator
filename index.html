@@ -11,14 +11,46 @@
     <title>Curator</title>
     <link rel="icon" href="assets/spotify_icon_64px.png">
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/app.css">
 </head>
 
 <body>
-<div id="curatorApp">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-12">
-                <button class="btn btn-primary btn-lg" type="submit">{{ message }}</button>
+<div id="curatorApp" class="container-fluid">
+    <div v-if="!isLoggedIn" class="jumbotron">
+        <div class="media">
+            <img class="mr-3" alt="Spotify logo" src="assets/spotify_icon_64px.png"/>
+            <div class="media-body">
+                <h1 class="mt-2">Curator</h1>
+            </div>
+        </div>
+        <hr class="my-4">
+        <p class="lead">playlist management tool for Spotify music curators
+            <a role="button" class="btn btn-primary btn-sm" href="https://github.com/emkor/curator"
+               title="Open project on GitHub" target="_blank">GitHub</a>
+            <a role="button" class="btn btn-primary btn-sm" href="https://emkor.github.io/"
+               title="Authors website" target="_blank">author</a>
+        </p>
+        <div class="text-center">
+            <button class="btn btn-success btn-lg mt-4" v-on:click="spotifyLogin">Login with Spotify</button>
+        </div>
+    </div>
+    <div v-else class="row">
+        <div class="col-sm-6">
+            <div class="media">
+                <img class="mr-3 thumb" alt="Spotify logo" src="assets/spotify_icon_64px.png"/>
+                <div class="media-body">
+                    <h3 class="mt-1">Curator</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6">
+            <div class="media">
+                <div class="media-body text-right">
+                    <h3 class="mt-1"><a v-bind:href="app.userUrl" target="_blank">{{ app.userName }}</a></h3>
+                </div>
+                <img class="ml-3 thumb" v-if="app.userImgUrl != null" v-bind:src="app.userImgUrl" alt="User avatar"/>
+                <a class="btn btn-danger mt-1 ml-3" role="button" href="/" title="Logout">Logout</a>
             </div>
         </div>
     </div>
@@ -30,6 +62,7 @@
 <script src="node_modules/popper.js/dist/umd/popper.min.js"></script>
 <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="node_modules/vue/dist/vue.min.js"></script>
+<script src="assets/cfg.js"></script>
 <script src="assets/app.js"></script>
 
 </html>
