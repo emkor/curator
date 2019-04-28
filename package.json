@@ -25,5 +25,8 @@
   "homepage": "https://github.com/emkor/curator#readme",
   "devDependencies": {
     "http-server": "^0.11.1"
+  },
+  "dependencies": {
+    "vue": "^2.6.10"
   }
 }
