@@ -9,15 +9,25 @@
     <meta name="keywords" content="emkor spotify playlist manager tool curated curator"/>
     <meta name="description" content="Spotify playlist curators tool">
     <title>Curator</title>
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
 </head>
 
 <body>
 <div id="curatorApp">
-    <h1>{{ message }}</h1>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <button class="btn btn-primary btn-lg" type="submit">{{ message }}</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 </body>
 
+<script src="node_modules/jquery/dist/jquery.min.js"></script>
+<script src="node_modules/popper.js/dist/umd/popper.min.js"></script>
+<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="node_modules/vue/dist/vue.min.js"></script>
 <script src="app.js"></script>
 
