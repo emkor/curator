@@ -1,6 +1,15 @@
 var app = new Vue({
     el: '#curatorApp',
     data: {
-        message: 'Hello Vue!'
+        config: appConfig,
+        token: null,
+        userName: null,
+        userUrl: null,
+        userImgUrl: null
+    },
+    computed: {
+        isLoggedIn: function () {
+            return this.token != null;
+        }
     }
-})
+});

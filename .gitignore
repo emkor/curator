@@ -4,5 +4,5 @@
 .envrc
 
 node_modules
-assets/config.js
+assets/cfg.js
 deps/*
