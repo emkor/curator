@@ -1,0 +1,29 @@
+{
+  "name": "curator",
+  "version": "0.0.1",
+  "description": "spotpm successor - tool for easier playlist management for Spotify playlist curators",
+  "main": "",
+  "scripts": {
+    "start": "http-server -p 8080 -u 127.0.0.1 -o -c-1",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emkor/curator.git"
+  },
+  "keywords": [
+    "spotify",
+    "playlist",
+    "manager",
+    "curator"
+  ],
+  "author": "emkor",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/emkor/curator/issues"
+  },
+  "homepage": "https://github.com/emkor/curator#readme",
+  "devDependencies": {
+    "http-server": "^0.11.1"
+  }
+}
