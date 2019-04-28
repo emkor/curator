@@ -1,6 +1,8 @@
 *.iml
 .idea
 
+.envrc
+
 node_modules
 assets/config.js
 deps/*
