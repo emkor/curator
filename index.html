@@ -9,35 +9,33 @@
     <meta name="keywords" content="emkor spotify playlist manager tool curated curator"/>
     <meta name="description" content="Spotify playlist curators tool">
     <title>Curator</title>
-    <link rel="icon" href="assets/spotify_icon_64px.png">
+    <link rel="icon" href="assets/spotify_white_64px.png">
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/app.css">
 </head>
 
 <body>
-<div id="curatorApp" class="container-fluid">
+<div id="curatorApp" class="container">
     <div v-if="!isLoggedIn" class="jumbotron">
         <div class="media">
-            <img class="mr-3" alt="Spotify logo" src="assets/spotify_icon_64px.png"/>
-            <div class="media-body">
+            <div class="media-body text-center">
                 <h1 class="mt-2">Curator</h1>
             </div>
         </div>
         <hr class="my-4">
-        <p class="lead">playlist management tool for Spotify music curators
+        <p class="lead text-center">playlist management tool for Spotify music curators
             <a role="button" class="btn btn-primary btn-sm" href="https://github.com/emkor/curator"
                title="Open project on GitHub" target="_blank">GitHub</a>
-            <a role="button" class="btn btn-primary btn-sm" href="https://emkor.github.io/"
-               title="Authors website" target="_blank">author</a>
         </p>
         <div class="text-center">
-            <button class="btn btn-success btn-lg mt-4" v-on:click="spotifyLogin">Login with Spotify</button>
+            <button class="btn btn-success btn-lg mt-4" v-on:click="spotifyLogin">Login to <img
+                    src="assets/spotify_white_64px.png" alt="Spotify logo" class="thumb"/></button>
         </div>
     </div>
     <div v-else class="row">
         <div class="col-sm-6">
             <div class="media">
-                <img class="mr-3 thumb" alt="Spotify logo" src="assets/spotify_icon_64px.png"/>
+                <img class="mr-3 thumb" alt="Spotify logo" src="assets/spotify_white_64px.png.png"/>
                 <div class="media-body">
                     <h3 class="mt-1">Curator</h3>
                 </div>
