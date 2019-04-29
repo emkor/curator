@@ -15,7 +15,7 @@
 </head>
 
 <body>
-<div id="curatorApp" class="container">
+<div id="curatorApp">
     <div v-if="!isLoggedIn" class="jumbotron">
         <div class="media">
             <div class="media-body text-center">
@@ -32,25 +32,34 @@
                     src="assets/spotify_white_64px.png" alt="Spotify logo" class="thumb"/></button>
         </div>
     </div>
-    <div v-else class="row">
-        <div class="col-sm-6">
-            <div class="media">
-                <div class="media-body">
-                    <h3 class="mt-1">Curator</h3>
-                </div>
-            </div>
-        </div>
+    <nav v-else class="navbar navbar-light bg-light">
+        <a class="navbar-brand">Curator</a>
+        <form class="form-inline">
+            <a v-bind:href="app.userUrl" target="_blank">
+                <img class="ml-3 thumb" v-if="app.userImgUrl != null" v-bind:src="app.userImgUrl"
+                     v-bind:alt="app.userName"/>
+            </a>
+            <a class="btn btn-danger ml-3" role="button" href="/" title="Logout">Logout</a>
+        </form>
+    </nav>
+    <!--<div class="row">-->
+    <!--<div class="col-sm-6">-->
+    <!--<div class="media">-->
+    <!--<div class="media-body">-->
+    <!--<h3 class="mt-1">Curator</h3>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
 
-        <div class="col-sm-6">
-            <div class="media">
-                <div class="media-body text-right">
-                    <h3 class="mt-1"><a v-bind:href="app.userUrl" target="_blank">{{ app.userName }}</a></h3>
-                </div>
-                <img class="ml-3 thumb" v-if="app.userImgUrl != null" v-bind:src="app.userImgUrl" alt="User avatar"/>
-                <a class="btn btn-danger ml-3 mt-1" role="button" href="/" title="Logout">Logout</a>
-            </div>
-        </div>
-    </div>
+    <!--<div class="col-sm-6">-->
+    <!--<div class="media">-->
+    <!--<div class="media-body text-right">-->
+    <!---->
+    <!--</div>-->
+    <!---->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
 </div>
 
 </body>
