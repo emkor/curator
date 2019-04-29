@@ -35,7 +35,6 @@
     <div v-else class="row">
         <div class="col-sm-6">
             <div class="media">
-                <img class="mr-3 thumb" alt="Spotify logo" src="assets/spotify_white_64px.png.png"/>
                 <div class="media-body">
                     <h3 class="mt-1">Curator</h3>
                 </div>
@@ -48,7 +47,7 @@
                     <h3 class="mt-1"><a v-bind:href="app.userUrl" target="_blank">{{ app.userName }}</a></h3>
                 </div>
                 <img class="ml-3 thumb" v-if="app.userImgUrl != null" v-bind:src="app.userImgUrl" alt="User avatar"/>
-                <a class="btn btn-danger mt-1 ml-3" role="button" href="/" title="Logout">Logout</a>
+                <a class="btn btn-danger ml-3 mt-1" role="button" href="/" title="Logout">Logout</a>
             </div>
         </div>
     </div>
