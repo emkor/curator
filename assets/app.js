@@ -48,7 +48,7 @@ var app = new Vue({
                             .then(v => resolve(v))
                             .catch(e => reject(e));
                     } else if (r.status === 401) {
-                        let message = "Oops! You have spent here so much time that Spotify need you to re-login";
+                        let message = "Oops! You have spent here so much time that we need you to re-login at Spotify!";
                         if (window.confirm(message)) {
                             window.location.href = "../index.html";
                         }
