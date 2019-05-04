@@ -32,16 +32,36 @@
                     src="assets/spotify_white_64px.png" alt="Spotify logo" class="thumb"/></button>
         </div>
     </div>
-    <nav v-else class="navbar navbar-light bg-light">
-        <a class="navbar-brand">Curator</a>
-        <form class="form-inline">
-            <a v-bind:href="app.userUrl" target="_blank">
-                <img class="thumb" v-if="app.userImgUrl != null" v-bind:src="app.userImgUrl"
-                     v-bind:alt="app.userName"/>
-            </a>
-            <a class="btn btn-danger ml-3" role="button" href="/" title="Logout">Logout</a>
-        </form>
-    </nav>
+    <div v-else>
+        <nav class="navbar navbar-light bg-light">
+            <a class="navbar-brand">Curator</a>
+            <form class="form-inline">
+                <a v-bind:href="app.userUrl" target="_blank">
+                    <img class="thumb" v-if="app.userImgUrl != null" v-bind:src="app.userImgUrl"
+                         v-bind:alt="app.userName"/>
+                </a>
+                <a class="btn btn-danger ml-3" role="button" href="/" title="Logout">Logout</a>
+            </form>
+        </nav>
+        <div class="row mt-3">
+            <div class="col-sm-12 text-center">
+                <div class="dropdown">
+                    <button class="btn btn-success btn-lg dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                            v-bind:disabled="!arePlayListsReady" v-bind:aria-disabled="!arePlayListsReady">
+                        {{ currPlayListName ? currPlayListName : 'Select playlist' }}
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <button class="dropdown-item" type="button"
+                                v-for="p in playListView"
+                                v-bind:name="'selectPlayList-' + p.id"
+                                v-on:click="selectPlayList">{{ p.name}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 </body>
