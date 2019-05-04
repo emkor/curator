@@ -71,6 +71,9 @@ var app = new Vue({
         userImgUrl: null,
         idToPlayList: null,
         playListView: [],
+        playListTracks: [],
+        idToTrack: null,
+        playIdToTrackId: null,
         currPlayListId: null,
         currPlayListName: null,
     },
@@ -79,17 +82,22 @@ var app = new Vue({
             return this.token != null;
         },
         arePlayListsReady: function () {
-            return app.playListView.length > 0;
+            return this.playListView.length > 0;
+        },
+        isPlayListSelected: function () {
+            return this.playListTracks.length > 0;
         }
     },
     methods: {
         start: function (currUrl) {
             this.token = new URL(currUrl.replace("#", "?")).searchParams.get('access_token');
             if (this.isLoggedIn) {
-                app.getUserInfo()
+                this.getUserInfo()
                     .then(_ => console.log("Done user"))
                     .then(_ => app.getPlayLists())
                     .then(_ => console.log("Done play lists"))
+                    .then(_ => app.getTracks())
+                    .then(_ => console.log("Done tracks"))
                     .catch(e => console.error(e));
             }
         },
@@ -121,17 +129,21 @@ var app = new Vue({
             for (var playlistId of app.idToPlaylist.keys()) {
                 promises.push(app.getPlayListTracks(playlistId));
             }
+            app.playIdToTrackId = new Map();
+            app.idToTrack = new Map();
             return Promise
                 .all(promises)
-                .then(playListTrackPromises => new Promise(function (resolve) {
-                    var playlistIdToTracks = new Map();
+                .then(playListTrackPromises => {
                     for (var promise of playListTrackPromises) {
                         for (var playListIdAndTracks of promise) {
-                            playlistIdToTracks.set(playListIdAndTracks[0], playListIdAndTracks[1].map(pl => pl.track));
+                            let playId = playListIdAndTracks[0];
+                            for (var playListTrack of playListIdAndTracks[1]) {
+                                app.idToTrack.set(playListTrack.track.id, playListTrack.track);
+                            }
+                            app.playIdToTrackId.set(playId, new Set(playListIdAndTracks[1].map(pl => pl.track.id)));
                         }
                     }
-                    resolve(playlistIdToTracks)
-                }));
+                });
         },
         getPlayListTracks: function (playListId) {
             return new Promise(function (resolve, reject) {
@@ -150,6 +162,8 @@ var app = new Vue({
             }
             app.currPlayListId = playlistId;
             app.currPlayListName = app.idToPlaylist.get(playlistId).name;
+            let trackIdsArray = Array.from(app.playIdToTrackId.get(app.currPlayListId));
+            app.playListTracks = trackIdsArray.map(i => app.idToTrack.get(i));
 
         },
         getJson: function (url) {
