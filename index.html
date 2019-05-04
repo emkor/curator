@@ -51,7 +51,7 @@
                             v-bind:disabled="!arePlayListsReady" v-bind:aria-disabled="!arePlayListsReady">
                         {{ currPlayListName ? currPlayListName : 'Select playlist' }}
                     </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <div class="dropdown-menu scrollable" aria-labelledby="dropdownMenuButton">
                         <button class="dropdown-item" type="button"
                                 v-for="p in playListView"
                                 v-bind:name="'selectPlayList-' + p.id"
