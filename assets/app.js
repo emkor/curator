@@ -9,7 +9,7 @@ function reqJson(req, url, retries) {
                 let retryInSeconds = r.headers.get("Retry-After");
                 let retryInMs = 1000 * (parseInt(retryInSeconds) + 0.05);
                 sleep(retryInMs)
-                    .then(_ => this.getJson(url))
+                    .then(_ => app.getJson(url))
                     .then(v => resolve(v))
                     .catch(e => reject(e));
             } else if (r.status === 401) {
@@ -18,12 +18,13 @@ function reqJson(req, url, retries) {
                     window.location.href = "../index.html";
                 }
             } else if (r.status === 404 && retries > 0) {
+                console.debug("Retrying due to " + r.status + ": " + r.statusText + "; retries left: " + retries - 1);
                 return reqJson(req, url, retries - 1)
             } else {
                 reject(r.status + ": " + r.statusText + " for " + req.method + " at " + url);
             }
         })
-    })
+    });
 }
 
 function reqPages(req, resp, acc, onSuccess) {
@@ -60,6 +61,32 @@ function mapIdToItem(items) {
     })
 }
 
+function mapSpotTrackForView(spotifyTrack) {
+    return {
+        id: spotifyTrack.id,
+        artistNamesAndUrls: spotifyTrack.artists.map(a => [a.name, a.external_urls.spotify]),
+        title: spotifyTrack.name,
+        titleUrl: spotifyTrack.external_urls.spotify,
+        url: spotifyTrack.uri,
+        albumImageUrl: spotifyTrack.album.images[spotifyTrack.album.images.length - 1].url,
+        albumName: spotifyTrack.album.name,
+        albumUrl: spotifyTrack.album.external_urls.spotify,
+        previewUrl: spotifyTrack.preview_url,
+        durationMs: spotifyTrack.duration_ms,
+        popularity: spotifyTrack.popularity
+    }
+}
+
+function toRatio(number) {
+    return (number / 100).toFixed(2);
+}
+
+function millisToMinutesAndSeconds(millis) {
+    var minutes = Math.floor(millis / 60000);
+    var seconds = ((millis % 60000) / 1000).toFixed(0);
+    return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+}
+
 
 var app = new Vue({
     el: '#curatorApp',
@@ -69,35 +96,34 @@ var app = new Vue({
         userName: null,
         userUrl: null,
         userImgUrl: null,
-        idToPlayList: null,
-        playListView: [],
-        playListTracks: [],
-        idToTrack: null,
-        playIdToTrackId: null,
+        idToPlayList: new Map(),
+        idToTrack: new Map(),
+        playIdToTrackId: new Map(),
+        trackIdToPlayId: new Map(),
         currPlayListId: null,
         currPlayListName: null,
+        playListsView: [],
+        currPlayListTracks: [],
+        tableSorter: null
     },
     computed: {
         isLoggedIn: function () {
             return this.token != null;
         },
         arePlayListsReady: function () {
-            return this.playListView.length > 0;
+            return this.playListsView.length > 0;
         },
         isPlayListSelected: function () {
-            return this.playListTracks.length > 0;
+            return this.currPlayListTracks.length > 0;
         }
     },
     methods: {
         start: function (currUrl) {
-            this.token = new URL(currUrl.replace("#", "?")).searchParams.get('access_token');
-            if (this.isLoggedIn) {
-                this.getUserInfo()
-                    .then(_ => console.log("Done user"))
-                    .then(_ => app.getPlayLists())
-                    .then(_ => console.log("Done play lists"))
-                    .then(_ => app.getTracks())
-                    .then(_ => console.log("Done tracks"))
+            app.token = new URL(currUrl.replace("#", "?")).searchParams.get('access_token');
+            if (app.isLoggedIn) {
+                app.getUserInfo()
+                    .then(_ => app.loadPlayLists())
+                    .then(_ => app.loadTracks())
                     .catch(e => console.error(e));
             }
         },
@@ -109,38 +135,48 @@ var app = new Vue({
                 + "&show_dialog=true&response_type=token";
         },
         getUserInfo: function () {
-            return app.getJson(this.config.apiUrl + "/me")
+            return app.getJson(app.config.apiUrl + "/me")
                 .then(r => {
-                    this.userName = r.display_name;
-                    this.userUrl = r.external_urls.spotify;
+                    app.userName = r.display_name;
+                    app.userUrl = r.external_urls.spotify;
                     if (r.images !== undefined && r.images.length > 0) {
-                        this.userImgUrl = r.images[0].url;
+                        app.userImgUrl = r.images[0].url;
                     }
                 })
         },
-        getPlayLists: function () {
-            return loadPagedItems(app.genApiReq("GET"), this.config.apiUrl + "/me/playlists?limit=50")
+        loadPlayLists: function () {
+            return loadPagedItems(app.genApiReq("GET"), app.config.apiUrl + "/me/playlists?limit=50")
                 .then(playLists => mapIdToItem(playLists))
-                .then(idToPlayList => app.idToPlaylist = idToPlayList)
-                .then(_ => app.playListView = Array.from(app.idToPlaylist.values()));
+                .then(idToPlayList => app.idToPlayList = idToPlayList)
+                .then(_ => app.playListsView = Array.from(app.idToPlayList.values()));
         },
-        getTracks: function () {
+        loadTracks: function () {
             let promises = [];
-            for (var playlistId of app.idToPlaylist.keys()) {
+            for (var playlistId of app.idToPlayList.keys()) {
                 promises.push(app.getPlayListTracks(playlistId));
             }
-            app.playIdToTrackId = new Map();
-            app.idToTrack = new Map();
             return Promise
                 .all(promises)
                 .then(playListTrackPromises => {
                     for (var promise of playListTrackPromises) {
                         for (var playListIdAndTracks of promise) {
                             let playId = playListIdAndTracks[0];
+                            let playTrackIds = new Set(playListIdAndTracks[1].map(pl => pl.track.id));
                             for (var playListTrack of playListIdAndTracks[1]) {
                                 app.idToTrack.set(playListTrack.track.id, playListTrack.track);
+                                if (app.playIdToTrackId.has(playId)) {
+                                    for (let trackId of playTrackIds) {
+                                        app.playIdToTrackId.get(playId).add(trackId);
+                                    }
+                                } else {
+                                    app.playIdToTrackId.set(playId, playTrackIds);
+                                }
+                                if (app.trackIdToPlayId.has(playListTrack.track.id)) {
+                                    app.trackIdToPlayId.get(playListTrack.track.id).add(playId);
+                                } else {
+                                    app.trackIdToPlayId.set(playListTrack.track.id, new Set().add(playId));
+                                }
                             }
-                            app.playIdToTrackId.set(playId, new Set(playListIdAndTracks[1].map(pl => pl.track.id)));
                         }
                     }
                 });
@@ -153,6 +189,15 @@ var app = new Vue({
                     .catch(e => reject("Error on retrieving playlist " + playListId + " tracks: " + e));
             });
         },
+        getPlaysWithTrack: function (trackId) {
+            let playIdsTrackIsIn = Array.from(app.trackIdToPlayId.get(trackId));
+            return app.playsFromIds(playIdsTrackIsIn);
+        },
+        getPlaysWithoutTrack: function (trackId) {
+            let playIdsWithTrack = app.trackIdToPlayId.get(trackId);
+            let playIdsWithoutTrack = Array.from(app.idToPlayList.keys()).filter(pId => !playIdsWithTrack.has(pId));
+            return app.playsFromIds(playIdsWithoutTrack);
+        },
         selectPlayList: function (event) {
             let playlistId = event.currentTarget.name.replace("selectPlayList-", "");
             let clickedLink = $(event.currentTarget);
@@ -161,22 +206,66 @@ var app = new Vue({
                 $(btnSibling).removeClass("active");
             }
             app.currPlayListId = playlistId;
-            app.currPlayListName = app.idToPlaylist.get(playlistId).name;
-            let trackIdsArray = Array.from(app.playIdToTrackId.get(app.currPlayListId));
-            app.playListTracks = trackIdsArray.map(i => app.idToTrack.get(i));
-
+            app.currPlayListName = app.idToPlayList.get(playlistId).name;
+            app.refreshPlayView();
+        },
+        addTrackToPlay: function (event) {
+            let trackIdAndPlayId = event.currentTarget.name.replace("add-", "").replace("to-", "").split("-");
+            let trackId = trackIdAndPlayId[0];
+            let playId = trackIdAndPlayId[1];
+            let addTrackUrl = app.config.apiUrl +
+                "/playlists/" + encodeURIComponent(playId) +
+                "/tracks?uris=" + encodeURIComponent("spotify:track:" + trackId);
+            return app.postJson(addTrackUrl)
+                .then(_ => {
+                    app.playIdToTrackId.get(playId).add(trackId);
+                    app.trackIdToPlayId.get(trackId).add(playId);
+                    app.refreshPlayView();
+                });
+        },
+        removeTrackFromPlay: function (event) {
+            let trackIdAndPlaylistId = event.currentTarget.name.replace("remove-", "").replace("from-", "").split("-");
+            let trackId = trackIdAndPlaylistId[0];
+            let playId = trackIdAndPlaylistId[1];
+            let rmUrl = app.config.apiUrl + "/playlists/" + encodeURIComponent(playlistId) + "/tracks";
+            let rmBody = {tracks: [{uri: "spotify:track:" + trackId}]};
+            app.deleteJson(rmUrl, rmBody)
+                .then(_ => {
+                    app.playIdToTrackId.get(playId).delete(trackId);
+                    app.trackIdToPlayId.get(trackId).delete(playId);
+                    app.refreshPlayView();
+                });
+        },
+        refreshPlayView: function () {
+            let trackIds = Array.from(app.playIdToTrackId.get(app.currPlayListId));
+            app.currPlayListTracks = trackIds.map(i => mapSpotTrackForView(app.idToTrack.get(i)));
+            if (app.tableSorter === null) {
+                app.tableSorter = new Tablesort(document.getElementById("playlistTracks"));
+            } else {
+                app.tableSorter.refresh();
+            }
         },
         getJson: function (url) {
             return reqJson(app.genApiReq("GET"), url, 1);
         },
+        postJson: function (url) {
+            return reqJson(app.genApiReq("POST"), url, 0);
+        },
+        deleteJson: function (url, body) {
+            return reqJson(app.genApiReq("DELETE", body), url, 0);
+        },
         genApiReq: function (method, body) {
-            if (method === "GET" || method === "DELETE") {
-                return {method: method, headers: {'Authorization': 'Bearer ' + this.token}};
-            } else if ((method === "POST" || method === "PUT") && (body !== undefined && body !== null)) {
-                return {method: method, headers: {'Authorization': 'Bearer ' + this.token}, body: body};
-            } else {
-                throw Error("Can not send request method " + method + " with body: " + body);
+            if (body !== undefined) {
+                return {method: method, headers: {'Authorization': 'Bearer ' + app.token}, body: JSON.stringify(body)};
             }
+            return {method: method, headers: {'Authorization': 'Bearer ' + app.token}};
+        },
+        playsFromIds: function (playIds) {
+            return playIds
+                .map(playlistId => app.idToPlayList.get(playlistId))
+                .sort(function (a, b) {
+                    return a.name.localeCompare(b.name)
+                })
         }
     }
 });
