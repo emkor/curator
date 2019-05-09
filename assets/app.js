@@ -76,7 +76,7 @@ function mapSpotTrackForView(spotifyTrack) {
         popularity: spotifyTrack.popularity
     };
     viewTrack.sortValueArtistTitle = makeSortString(viewTrack.artistNamesAndUrls[0][0] + " " + viewTrack.title);
-    viewTrack.sortValueArtistAlbum = makeSortString(viewTrack.artistNamesAndUrls[0][0] + " " + viewTrack.albumName + " "  + viewTrack.title);
+    viewTrack.sortValueArtistAlbum = makeSortString(viewTrack.artistNamesAndUrls[0][0] + " " + viewTrack.albumName + " " + viewTrack.title);
     return viewTrack
 }
 
@@ -237,7 +237,7 @@ var app = new Vue({
             let trackIdAndPlaylistId = event.currentTarget.name.replace("remove-", "").replace("from-", "").split("-");
             let trackId = trackIdAndPlaylistId[0];
             let playId = trackIdAndPlaylistId[1];
-            let rmUrl = app.config.apiUrl + "/playlists/" + encodeURIComponent(playlistId) + "/tracks";
+            let rmUrl = app.config.apiUrl + "/playlists/" + encodeURIComponent(playId) + "/tracks";
             let rmBody = {tracks: [{uri: "spotify:track:" + trackId}]};
             app.deleteJson(rmUrl, rmBody)
                 .then(_ => {
