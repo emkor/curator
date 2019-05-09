@@ -7,3 +7,15 @@
     height: 50vh;
     overflow-y: scroll;
 }
+
+.addToPlaylistMenu .dropdown-menu {
+    width: 33vw;
+}
+
+.addToPlaylistMenu .dropdown-menu a button {
+    display: block;
+}
+
+.clickable {
+    cursor: pointer;
+}

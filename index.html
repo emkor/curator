@@ -12,6 +12,7 @@
     <link rel="icon" href="assets/spotify_white_64px.png">
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="node_modules/tablesort/tablesort.css">
     <link rel="stylesheet" href="assets/app.css">
 </head>
 
@@ -67,12 +68,12 @@
                 <table id="playlistTracks" class="table table-striped table-hover table-sm table-responsive-md">
                     <thead>
                     <tr>
-                        <th data-sort-method='none'>Preview</th>
-                        <th title="Sort by Artist - Album - Track">Album</th>
-                        <th title="Sort by Artist - Track - Album">Track</th>
-                        <th title="Sort by track duration">Duration</th>
-                        <th title="Sort by track popularity">Popularity</th>
-                        <th data-sort-method='none'>Add to</th>
+                        <th class="no-sort" data-sort-method='none' style="min-width: 100px">Preview</th>
+                        <th title="Sort by Artist - Album - Track" style="min-width: 75px">Album</th>
+                        <th title="Sort by Artist - Track - Album" style="min-width: 120px">Track</th>
+                        <th title="Sort by track duration" style="min-width: 85px">Duration</th>
+                        <th title="Sort by track popularity" style="min-width: 100px">Popularity</th>
+                        <th class="no-sort" data-sort-method='none'>Add to</th>
                         <th title="Sort by number of playlists track is on">Remove from</th>
                     </tr>
                     </thead>
@@ -129,10 +130,10 @@
                                         title="Add the track to playlist">
                                     <i class="fa fa-plus" aria-hidden="true"></i>
                                 </button>
-                                <div class="dropdown-menu"
+                                <div class="dropdown-menu scrollable"
                                      v-bind:aria-labelledby="'addToPlaylistDropDown-' + track.id">
                                     <a class="dropdown-item" href="javascript: void(0)">
-                                        <button type="button" class="btn btn-sm btn-success"
+                                        <button type="button" class="btn btn-sm btn-success mb-1 ml-1"
                                                 v-bind:name="'add-' + track.id + '-to-' + playlistTrackMightBeAddTo.id"
                                                 v-on:click="addTrackToPlay"
                                                 v-for="playlistTrackMightBeAddTo in getPlaysWithoutTrack(track.id)">
@@ -144,7 +145,7 @@
                             </div>
                         </td>
                         <td v-bind:data-sort='getPlaysWithTrack(track.id).length'>
-                            <button class="btn btn-danger btn-md"
+                            <button class="btn btn-danger btn-md mb-1 ml-1"
                                     title="Remove track from playlist"
                                     v-for="trackPlaylist in getPlaysWithTrack(track.id)"
                                     v-bind:name="'remove-' + track.id + '-from-' + trackPlaylist.id"
