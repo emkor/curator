@@ -97,6 +97,16 @@ function millisToMinutesAndSeconds(millis) {
     return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
 }
 
+class UserAction {
+    constructor(isAddition, playId, playName, trackId, trackName) {
+        this.isAddition = isAddition;
+        this.playId = playId;
+        this.playName = playName;
+        this.trackId = trackId;
+        this.trackName = trackName;
+    }
+}
+
 
 var app = new Vue({
     el: '#curatorApp',
@@ -114,7 +124,8 @@ var app = new Vue({
         currPlayListName: null,
         playListsView: [],
         currPlayListTracks: [],
-        tableSorter: null
+        tableSorter: null,
+        userActions: []
     },
     computed: {
         isLoggedIn: function () {
@@ -230,6 +241,7 @@ var app = new Vue({
                 .then(_ => {
                     app.playIdToTrackId.get(playId).add(trackId);
                     app.trackIdToPlayId.get(trackId).add(playId);
+                    app.addAction(new UserAction(true, playId, app.idToPlayList.get(playId).name, trackId, app.idToTrack.get(trackId).name));
                     app.refreshPlayView();
                 });
         },
@@ -243,8 +255,15 @@ var app = new Vue({
                 .then(_ => {
                     app.playIdToTrackId.get(playId).delete(trackId);
                     app.trackIdToPlayId.get(trackId).delete(playId);
+                    app.addAction(new UserAction(false, playId, app.idToPlayList.get(playId).name, trackId, app.idToTrack.get(trackId).name));
                     app.refreshPlayView();
                 });
+        },
+        addAction: function (action) {
+            if (app.userActions.length >= 10) {
+                app.userActions.shift();
+            }
+            app.userActions.push(action)
         },
         refreshPlayView: function () {
             let trackIds = Array.from(app.playIdToTrackId.get(app.currPlayListId));

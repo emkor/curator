@@ -158,10 +158,33 @@
                     </tbody>
                 </table>
             </div>
+
         </div>
+        <div class="row mt-3">
+            <div class="col-sm-12">
+                <h3>Actions log</h3>
+                <div class="row" v-for="a in userActions">
+                    <div class="col-sm-6">
+                        <p v-if="a.isAddition === true">Added track <b>{{ a.trackName }}</b> to playlist <b>{{ a.playName }}</b>
+                        </p>
+                        <p v-else>Removed track <b>{{ a.trackName }}</b> from playlist <b>{{ a.playName }}</b></p>
+                    </div>
+                    <div class="col-sm-6">
+                        <button v-if="a.isAddition === true" v-on:click="removeTrackFromPlay"
+                                v-bind:name="'remove-' + a.trackId + '-from-' + a.playId"
+                                class="btn btn-warning btn-sm ml-1">Undo addition
+                        </button>
+                        <button v-else v-on:click="addTrackToPlay"
+                                v-bind:name="'add-' + a.trackId + '-to-' + a.playId"
+                                class="btn btn-warning btn-sm ml-1">Undo removal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
-
 </body>
 
 <script src="node_modules/jquery/dist/jquery.min.js"></script>
