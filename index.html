@@ -70,7 +70,7 @@
                     <tr>
                         <th class="no-sort" data-sort-method='none' style="min-width: 100px">Preview</th>
                         <th title="Sort by Artist - Album - Track" style="min-width: 75px">Album</th>
-                        <th title="Sort by Artist - Track - Album" style="min-width: 120px">Track</th>
+                        <th title="Sort by Artist - Track" style="min-width: 120px">Track</th>
                         <th title="Sort by track duration" style="min-width: 85px">Duration</th>
                         <th title="Sort by track popularity" style="min-width: 100px">Popularity</th>
                         <th class="no-sort" data-sort-method='none'>Add to</th>
@@ -95,13 +95,13 @@
                                     </a>
                                 </span>
                         </td>
-                        <td v-bind:data-sort='track.artistNamesAndUrls[0][0] + track.albumName + track.title'
+                        <td v-bind:data-sort='track.sortValueArtistAlbum'
                             class="trackAlbumGridCell">
                             <a title="Open album in Spotify Web Player" v-bind:href="track.albumUrl">
                                 <img v-bind:src="track.albumImageUrl"
                                      v-bind:alt="track.albumName + ' album cover'"/></a>
                         </td>
-                        <td v-bind:data-sort='track.artistNamesAndUrls[0][0] + track.title'>
+                        <td v-bind:data-sort='track.sortValueArtistTitle'>
                             <p class="trackArtistAndAlbum">
                                 <a v-bind:href="track.titleUrl" target="_blank">
                                     {{ track.title }}

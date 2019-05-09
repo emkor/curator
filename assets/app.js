@@ -62,7 +62,7 @@ function mapIdToItem(items) {
 }
 
 function mapSpotTrackForView(spotifyTrack) {
-    return {
+    let viewTrack = {
         id: spotifyTrack.id,
         artistNamesAndUrls: spotifyTrack.artists.map(a => [a.name, a.external_urls.spotify]),
         title: spotifyTrack.name,
@@ -74,7 +74,17 @@ function mapSpotTrackForView(spotifyTrack) {
         previewUrl: spotifyTrack.preview_url,
         durationMs: spotifyTrack.duration_ms,
         popularity: spotifyTrack.popularity
-    }
+    };
+    viewTrack.sortValueArtistTitle = makeSortString(viewTrack.artistNamesAndUrls[0][0] + " " + viewTrack.title);
+    viewTrack.sortValueArtistAlbum = makeSortString(viewTrack.artistNamesAndUrls[0][0] + " " + viewTrack.albumName + " "  + viewTrack.title);
+    return viewTrack
+}
+
+function makeSortString(text) {
+    return text.toLowerCase()
+        .replace(/the /g, '')
+        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+        .replace(/\s{2,}/g, " ");
 }
 
 function toRatio(number) {
