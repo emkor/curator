@@ -17,6 +17,11 @@
     max-height: 50vh;
 }
 
+.addToPlaylistMenu .dropdown-menu .dropdown-item:hover, .addToPlaylistMenu .dropdown-menu .dropdown-item:focus {
+    background-color: transparent;
+    cursor: default;
+}
+
 .addToPlaylistMenu .dropdown-menu a button {
     display: block;
 }
@@ -36,3 +41,4 @@
 #actionListing {
     height: 15vh;
 }
+
