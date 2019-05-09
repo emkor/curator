@@ -59,8 +59,8 @@
                 <a class="btn btn-danger ml-3" role="button" href="/" title="Logout">Logout</a>
             </form>
         </nav>
-        <div id="trackListing" class="row mt-3 px-3">
-            <div class="col-sm-12">
+        <div id="trackListing" class="row mt-2 px-3">
+            <div class="col col-sm-12 scrollable">
                 <table id="playlistTracks" class="table table-striped table-hover table-sm table-responsive-md">
                     <thead>
                     <tr>
@@ -156,9 +156,9 @@
             </div>
 
         </div>
-        <div id="actionListing" class="row mt-3 px-3">
+        <div id="actionListing" class="row mt-2 px-3">
             <div class="col-sm-12">
-                <h3>Actions log</h3>
+                <h4>Actions</h4>
                 <div v-for="a in userActions" class="alert alert-primary" role="alert">
                     <span v-if="a.isAddition === true">Added track <b>{{ a.trackName }}</b> to playlist <b>{{
                         a.playName }}</b>

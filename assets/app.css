@@ -29,12 +29,10 @@
     content: ", ";
 }
 
-#trackListing {
+#trackListing .scrollable {
     height: 70vh;
-    overflow-y: scroll;
-    display: block;
 }
 
 #actionListing {
-    height: 20vh;
+    height: 15vh;
 }
