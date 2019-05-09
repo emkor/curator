@@ -122,6 +122,7 @@ var app = new Vue({
         trackIdToPlayId: new Map(),
         currPlayListId: null,
         currPlayListName: null,
+        currentTrackId: null,
         playListsView: [],
         currPlayListTracks: [],
         tableSorter: null,
@@ -258,6 +259,10 @@ var app = new Vue({
                     app.addAction(new UserAction(false, playId, app.idToPlayList.get(playId).name, trackId, app.idToTrack.get(trackId).name));
                     app.refreshPlayView();
                 });
+        },
+        setCurrTrack: function (event) {
+            let trackId = event.currentTarget.name.replace("setCurrTrack-", "");
+            app.currentTrackId = trackId;
         },
         addAction: function (action) {
             if (app.userActions.length >= 10) {

@@ -78,8 +78,9 @@
                         <td data-sort-method='none'>
                                 <span>
                                     <button class="btn btn-primary btn-md"
-                                            title="Play in iframe"
-                                            v-bind:name="'setCurrentTrack-' + track.id">
+                                            title="Play"
+                                            v-bind:name="'setCurrTrack-' + track.id"
+                                            v-on:click="setCurrTrack">
                                         <i class="fa fa-play" aria-hidden="true"></i>
                                     </button>
                                 </span>
@@ -157,7 +158,7 @@
 
         </div>
         <div id="actionListing" class="row mt-2 px-3">
-            <div class="col-sm-12">
+            <div class="col-md-6">
                 <h4>Actions</h4>
                 <div v-for="a in userActions" class="alert alert-primary" role="alert">
                     <span v-if="a.isAddition === true">Added track <b>{{ a.trackName }}</b> to playlist <b>{{
@@ -173,8 +174,21 @@
                             class="btn btn-primary btn-sm ml-1">Undo
                     </button>
                 </div>
+                <div v-if="userActions.length == 0" role="alert" class="alert alert-primary">
+                    No actions yet
+                </div>
             </div>
-
+            <div class="col-sm-6">
+                <h4>Player</h4>
+                <iframe v-if="currentTrackId != null"
+                        v-bind:src="'https://open.spotify.com/embed/track/' + currentTrackId"
+                        width="300" height="80" frameborder="0" allowtransparency="true"
+                        allow="encrypted-media">
+                </iframe>
+                <div v-else role="alert" class="alert alert-primary">
+                    Select playlist and then track to see player
+                </div>
+            </div>
         </div>
     </div>
 </div>
