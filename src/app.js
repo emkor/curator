@@ -1,3 +1,20 @@
+import './spotify_white_64px.png';
+import './app.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootswatch/dist/darkly/bootstrap.min.css';
+import 'font-awesome/css/font-awesome.min.css';
+import 'tablesort/tablesort.css';
+import 'tablesort/tablesort.css';
+import 'tablesort/tablesort.css';
+
+window.$ = require('jquery');
+require('bootstrap');
+require('popper.js');
+require('tablesort');
+require('./cfg.js');
+
+import Vue from 'vue'
+
 function reqJson(req, url, retries) {
     return new Promise(function (resolve, reject) {
         fetch(url, req).then(r => {
@@ -15,7 +32,7 @@ function reqJson(req, url, retries) {
             } else if (r.status === 401) {
                 let message = "Oops! You have spent here so much time that we need you to re-login at Spotify!";
                 if (window.confirm(message)) {
-                    window.location.href = "../index.html";
+                    window.location.href = "index.html";
                 }
             } else if (r.status === 404 && retries > 0) {
                 console.debug("Retrying due to " + r.status + ": " + r.statusText + "; retries left: " + retries - 1);

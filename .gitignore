@@ -4,5 +4,7 @@
 .envrc
 
 node_modules
-assets/cfg.js
+src/cfg.js
 deps/*
+
+dist/
