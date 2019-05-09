@@ -4,12 +4,17 @@
 }
 
 .scrollable {
-    height: 50vh;
     overflow-y: scroll;
 }
 
+#playlistListing .dropdown-menu {
+    max-width: 75vw;
+    max-height: 75vh;
+}
+
 .addToPlaylistMenu .dropdown-menu {
-    width: 33vw;
+    max-width: 50vw;
+    max-height: 50vh;
 }
 
 .addToPlaylistMenu .dropdown-menu a button {
@@ -18,4 +23,18 @@
 
 .clickable {
     cursor: pointer;
+}
+
+.trackArtist + .trackArtist:before {
+    content: ", ";
+}
+
+#trackListing {
+    height: 70vh;
+    overflow-y: scroll;
+    display: block;
+}
+
+#actionListing {
+    height: 20vh;
 }

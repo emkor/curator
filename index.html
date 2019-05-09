@@ -35,9 +35,9 @@
         </div>
     </div>
     <div v-else>
-        <nav class="navbar navbar-light bg-light px-3">
+        <nav id="topMenu" class="navbar navbar-light bg-light px-3">
             <a class="navbar-brand">Curator</a>
-            <div class="dropdown">
+            <div id="playlistListing" class="dropdown">
                 <button class="btn btn-success btn-md dropdown-toggle" type="button" id="dropdownMenuButton"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         v-bind:disabled="!arePlayListsReady" v-bind:aria-disabled="!arePlayListsReady">
@@ -59,7 +59,7 @@
                 <a class="btn btn-danger ml-3" role="button" href="/" title="Logout">Logout</a>
             </form>
         </nav>
-        <div class="row mt-3 px-3">
+        <div id="trackListing" class="row mt-3 px-3">
             <div class="col-sm-12">
                 <table id="playlistTracks" class="table table-striped table-hover table-sm table-responsive-md">
                     <thead>
@@ -129,6 +129,7 @@
                                      v-bind:aria-labelledby="'addToPlaylistDropDown-' + track.id">
                                     <a class="dropdown-item" href="javascript: void(0)">
                                         <button type="button" class="btn btn-sm btn-success mb-1"
+                                                title="Add track to playlist"
                                                 v-bind:name="'add-' + track.id + '-to-' + playlistTrackMightBeAddTo.id"
                                                 v-on:click="addTrackToPlay"
                                                 v-for="playlistTrackMightBeAddTo in getPlaysWithoutTrack(track.id)">
@@ -155,30 +156,26 @@
             </div>
 
         </div>
-        <div class="row mt-3 px-3">
+        <div id="actionListing" class="row mt-3 px-3">
             <div class="col-sm-12">
                 <h3>Actions log</h3>
-                <div class="row" v-for="a in userActions">
-                    <div class="col-sm-6">
-                        <p v-if="a.isAddition === true">Added track <b>{{ a.trackName }}</b> to playlist <b>{{
-                            a.playName }}</b>
-                        </p>
-                        <p v-else>Removed track <b>{{ a.trackName }}</b> from playlist <b>{{ a.playName }}</b></p>
-                    </div>
-                    <div class="col-sm-6">
-                        <button v-if="a.isAddition === true" v-on:click="removeTrackFromPlay"
-                                v-bind:name="'remove-' + a.trackId + '-from-' + a.playId"
-                                class="btn btn-warning btn-sm ml-1">Undo addition
-                        </button>
-                        <button v-else v-on:click="addTrackToPlay"
-                                v-bind:name="'add-' + a.trackId + '-to-' + a.playId"
-                                class="btn btn-warning btn-sm ml-1">Undo removal
-                        </button>
-                    </div>
+                <div v-for="a in userActions" class="alert alert-primary" role="alert">
+                    <span v-if="a.isAddition === true">Added track <b>{{ a.trackName }}</b> to playlist <b>{{
+                        a.playName }}</b>
+                    </span>
+                    <span v-else>Removed track <b>{{ a.trackName }}</b> from playlist <b>{{ a.playName }}</b></span>
+                    <button v-if="a.isAddition === true" v-on:click="removeTrackFromPlay"
+                            v-bind:name="'remove-' + a.trackId + '-from-' + a.playId"
+                            class="btn btn-primary btn-sm ml-1">Undo
+                    </button>
+                    <button v-else v-on:click="addTrackToPlay"
+                            v-bind:name="'add-' + a.trackId + '-to-' + a.playId"
+                            class="btn btn-primary btn-sm ml-1">Undo
+                    </button>
                 </div>
             </div>
-        </div>
 
+        </div>
     </div>
 </div>
 </body>
