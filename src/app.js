@@ -297,9 +297,6 @@ var app = new Vue({
         playsFromIds: function (playIds) {
             return playIds
                 .map(playlistId => app.idToPlayList.get(playlistId))
-                .sort(function (a, b) {
-                    return a.name.localeCompare(b.name)
-                })
         }
     }
 });
