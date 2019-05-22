@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="author" content="emkor">
+    <meta name="keywords" content="emkor spotify playlist manager tool curated curator"/>
+    <meta name="description" content="Spotify playlist curators tool">
+    <title>Curator</title>
+    <link rel="icon" href="src/spotify_white_64px.png">
+    <link rel="stylesheet" href="dep/bootstrap.min.css">
+    <link rel="stylesheet" href="dep/css/font-awesome.min.css">
+    <link rel="stylesheet" href="dep/tablesort.css">
+    <link rel="stylesheet" href="src/app.css">
+</head>
+
+<body>
+<div id="curatorApp">
+    <div v-if="!isLoggedIn" class="jumbotron">
+        <div class="media">
+            <div class="media-body text-center">
+                <h1 class="mt-2">Curator</h1>
+            </div>
+        </div>
+        <hr class="my-4">
+        <p class="lead text-center">playlist management tool for Spotify music curators
+            <a role="button" class="btn btn-primary btn-sm" href="https://github.com/emkor/curator"
+               title="Open project on GitHub" target="_blank">GitHub</a>
+        </p>
+        <div class="text-center">
+            <button class="btn btn-success btn-lg mt-4" v-on:click="spotifyLogin">Login to <img
+                    src="src/spotify_white_64px.png" alt="Spotify logo" class="thumb"/></button>
+        </div>
+    </div>
+    <div v-else>
+        <nav id="topMenu" class="navbar navbar-light bg-light px-3">
+            <a class="navbar-brand">Curator</a>
+            <div id="playlistListing" class="dropdown">
+                <button class="btn btn-success btn-md dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        v-bind:disabled="!arePlayListsReady" v-bind:aria-disabled="!arePlayListsReady">
+                    {{ currPlayListName ? currPlayListName : 'Select playlist' }}
+                </button>
+                <div class="dropdown-menu scrollable" aria-labelledby="dropdownMenuButton">
+                    <button class="dropdown-item" type="button"
+                            v-for="p in playListsView"
+                            v-bind:name="'selectPlayList-' + p.id"
+                            v-on:click="selectPlayList">{{ p.name}}
+                    </button>
+                </div>
+            </div>
+            <form class="form-inline">
+                <a v-bind:href="app.userUrl" target="_blank">
+                    <img class="thumb" v-if="app.userImgUrl != null" v-bind:src="app.userImgUrl"
+                         v-bind:alt="app.userName"/>
+                </a>
+                <a class="btn btn-danger ml-3" role="button" href="/" title="Logout">Logout</a>
+            </form>
+        </nav>
+        <div id="trackListing" class="row mt-3 px-3">
+            <div class="col col-sm-12 scrollable">
+                <table id="playlistTracks" class="table table-striped table-hover table-sm table-responsive-md">
+                    <thead>
+                    <tr>
+                        <th class="no-sort" data-sort-method='none' style="min-width: 100px">Preview</th>
+                        <th title="Sort by Artist - Album - Track" style="min-width: 75px">Album</th>
+                        <th title="Sort by Artist - Track" style="min-width: 120px">Track</th>
+                        <th title="Sort by track duration" style="min-width: 85px">Duration</th>
+                        <th title="Sort by track popularity" style="min-width: 100px">Popularity</th>
+                        <th class="no-sort" data-sort-method='none'>Add to</th>
+                        <th title="Sort by number of playlists track is on">Remove from</th>
+                    </tr>
+                    </thead>
+                    <tbody v-if="isPlayListSelected">
+                    <tr v-for="track in currPlayListTracks" v-bind:id="'trackRow-' + track.id">
+                        <td data-sort-method='none'>
+                                <span>
+                                    <button class="btn btn-primary btn-md"
+                                            title="Play"
+                                            v-bind:name="'setCurrTrack-' + track.id"
+                                            v-on:click="setCurrTrack">
+                                        <i class="fa fa-play" aria-hidden="true"></i>
+                                    </button>
+                                </span>
+                            <span v-if="track.titleUrl != null">
+                                    <a role="button" class="btn btn-success btn-md" target="_blank"
+                                       title="Open in Spotify Web Player"
+                                       v-bind:href="track.titleUrl">
+                                        <i class="fa fa-spotify" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                        </td>
+                        <td v-bind:data-sort='track.sortValueArtistAlbum'
+                            class="trackAlbumGridCell">
+                            <a title="Open album in Spotify Web Player" v-bind:href="track.albumUrl">
+                                <img v-bind:src="track.albumImageUrl"
+                                     v-bind:alt="track.albumName + ' album cover'"/></a>
+                        </td>
+                        <td v-bind:data-sort='track.sortValueArtistTitle'>
+                            <p class="trackArtistAndAlbum">
+                                <a v-bind:href="track.titleUrl" target="_blank">
+                                    {{ track.title }}
+                                </a><br/>
+                                <small>
+                                    by&nbsp;<a class="trackArtist" target="_blank"
+                                               v-bind:href="trackArtistAndUrl[1]"
+                                               v-for="trackArtistAndUrl in track.artistNamesAndUrls">{{
+                                    trackArtistAndUrl[0] }}</a><br/>
+                                    from&nbsp;<a target="_blank" v-bind:href="track.albumUrl">{{
+                                    track.albumName}}</a>
+
+                                </small>
+                            </p>
+                        </td>
+                        <td title="Duration" v-bind:data-sort='track.durationMs'>
+                            {{ millisToMinutesAndSeconds(track.durationMs) }}
+                        </td>
+                        <td title="Popularity">{{ toRatio(track.popularity) }}</td>
+                        <td data-sort-method='none'>
+                            <div class="dropdown addToPlaylistMenu">
+                                <button v-bind:id="'addToPlaylistDropDown-' + track.id"
+                                        class="btn btn-secondary btn-success btn-md dropdown-toggle" type="button"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                        title="Add the track to playlist">
+                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                </button>
+                                <div class="dropdown-menu scrollable"
+                                     v-bind:aria-labelledby="'addToPlaylistDropDown-' + track.id">
+                                    <a class="dropdown-item" href="javascript: void(0)"
+                                       v-for="playlistTrackMightBeAddTo in getPlaysWithoutTrack(track.id)">
+                                        <button type="button" class="btn btn-sm btn-success mb-1"
+                                                title="Add track to playlist"
+                                                v-bind:name="'add-' + track.id + '-to-' + playlistTrackMightBeAddTo.id"
+                                                v-on:click="addTrackToPlay">
+                                            {{ playlistTrackMightBeAddTo.name }}
+                                            &nbsp;<i class="fa fa-plus" aria-hidden="true"></i>
+                                        </button>
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                        <td v-bind:data-sort='getPlaysWithTrack(track.id).length'>
+                            <button class="btn btn-danger btn-md mb-1 ml-1"
+                                    title="Remove track from playlist"
+                                    v-for="trackPlaylist in getPlaysWithTrack(track.id)"
+                                    v-bind:name="'remove-' + track.id + '-from-' + trackPlaylist.id"
+                                    v-on:click="removeTrackFromPlay">
+                                {{ trackPlaylist.name }}&nbsp;
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+        <div class="row mt-3 px-3">
+            <div id="actionListing" class="col-md-6 scrollable">
+                <h4>Actions</h4>
+                <div v-for="a in userActions" class="alert alert-secondary" role="alert">
+                    <span v-if="a.isAddition === true">Added track <b>{{ a.trackName }}</b> to playlist <b>{{
+                        a.playName }}</b>
+                    </span>
+                    <span v-else>Removed track <b>{{ a.trackName }}</b> from playlist <b>{{ a.playName }}</b></span>
+                    <button v-if="a.isAddition === true" v-on:click="removeTrackFromPlay"
+                            v-bind:name="'remove-' + a.trackId + '-from-' + a.playId"
+                            class="btn btn-warning btn-sm ml-1">Undo
+                    </button>
+                    <button v-else v-on:click="addTrackToPlay"
+                            v-bind:name="'add-' + a.trackId + '-to-' + a.playId"
+                            class="btn btn-warning btn-sm ml-1">Undo
+                    </button>
+                </div>
+                <div v-if="userActions.length == 0" role="alert" class="alert alert-primary">
+                    No actions yet
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <h4>Player</h4>
+                <iframe v-if="currentTrackId != null"
+                        v-bind:src="'https://open.spotify.com/embed/track/' + currentTrackId"
+                        width="300" height="80" frameborder="0" allowtransparency="true"
+                        allow="encrypted-media">
+                </iframe>
+                <div v-else role="alert" class="alert alert-primary">
+                    Select playlist and then track to see player
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+<script src="dep/jquery.min.js"></script>
+<script src="dep/popper.min.js"></script>
+<script src="dep/bootstrap.min.js"></script>
+<script src="dep/vue.min.js"></script>
+<script src="dep/tablesort.min.js"></script>
+<script src="dep/tablesort.number.min.js"></script>
+<script src="src/cfg.js"></script>
+<script src="src/app.js"></script>
+
+</html>

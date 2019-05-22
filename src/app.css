@@ -1,0 +1,44 @@
+.thumb {
+    max-height: 2.4rem;
+    width: auto;
+}
+
+.scrollable {
+    overflow-y: scroll;
+}
+
+#playlistListing .dropdown-menu {
+    max-width: 75vw;
+    max-height: 75vh;
+}
+
+.addToPlaylistMenu .dropdown-menu {
+    max-width: 50vw;
+    max-height: 50vh;
+}
+
+.addToPlaylistMenu .dropdown-menu .dropdown-item:hover, .addToPlaylistMenu .dropdown-menu .dropdown-item:focus {
+    background-color: transparent;
+    cursor: default;
+}
+
+.addToPlaylistMenu .dropdown-menu a button {
+    display: block;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.trackArtist + .trackArtist:before {
+    content: ", ";
+}
+
+#trackListing .scrollable {
+    height: 70vh;
+}
+
+#actionListing {
+    height: 15vh;
+}
+
