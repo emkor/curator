@@ -25,4 +25,4 @@ cp -R dep dist
 cp -R src dist
 cp index.html dist
 
-echo "Done"
+echo "Done! Don't forget to edit dist/src/cfg.js"
