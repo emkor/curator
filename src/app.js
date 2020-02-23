@@ -241,8 +241,16 @@ var app = new Vue({
                 "/tracks?uris=" + encodeURIComponent("spotify:track:" + trackId);
             return app.postJson(addTrackUrl)
                 .then(_ => {
-                    app.playIdToTrackId.get(playId).add(trackId);
-                    app.trackIdToPlayId.get(trackId).add(playId);
+                    if (app.playIdToTrackId.has(playId)) {
+                        app.playIdToTrackId.get(playId).add(trackId);
+                    } else {
+                        app.playIdToTrackId.set(playId, [trackId])
+                    }
+                    if (app.trackIdToPlayId.has(trackId)) {
+                        app.trackIdToPlayId.get(trackId).add(playId);
+                    } else {
+                        app.trackIdToPlayId.set(trackId, [playId])
+                    }
                     app.addAction(new UserAction(true, playId, app.idToPlayList.get(playId).name, trackId, app.idToTrack.get(trackId).name));
                     app.refreshPlayView();
                 });
