@@ -8,10 +8,11 @@ function reqJson(req, url, retries) {
             } else if (r.status === 429) {
                 let retryInSeconds = r.headers.get("Retry-After");
                 let retryInMs = 1000 * (parseInt(retryInSeconds) + 0.05);
-                sleep(retryInMs)
-                    .then(_ => app.getJson(url))
-                    .then(v => resolve(v))
-                    .catch(e => reject(e));
+                window.setTimeout(() => {
+                    app.getJson(url)
+                        .then(v => resolve(v))
+                        .catch(e => reject(e));
+                }, retryInMs);
             } else if (r.status === 401) {
                 let message = "Oops! You have spent here so much time that we need you to re-login at Spotify!";
                 if (window.confirm(message)) {
