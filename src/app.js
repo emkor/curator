@@ -8,10 +8,11 @@ function reqJson(req, url, retries) {
             } else if (r.status === 429) {
                 let retryInSeconds = r.headers.get("Retry-After");
                 let retryInMs = 1000 * (parseInt(retryInSeconds) + 0.05);
-                sleep(retryInMs)
-                    .then(_ => app.getJson(url))
-                    .then(v => resolve(v))
-                    .catch(e => reject(e));
+                window.setTimeout(() => {
+                    app.getJson(url)
+                        .then(v => resolve(v))
+                        .catch(e => reject(e));
+                }, retryInMs);
             } else if (r.status === 401) {
                 let message = "Oops! You have spent here so much time that we need you to re-login at Spotify!";
                 if (window.confirm(message)) {
@@ -240,8 +241,16 @@ var app = new Vue({
                 "/tracks?uris=" + encodeURIComponent("spotify:track:" + trackId);
             return app.postJson(addTrackUrl)
                 .then(_ => {
-                    app.playIdToTrackId.get(playId).add(trackId);
-                    app.trackIdToPlayId.get(trackId).add(playId);
+                    if (app.playIdToTrackId.has(playId)) {
+                        app.playIdToTrackId.get(playId).add(trackId);
+                    } else {
+                        app.playIdToTrackId.set(playId, [trackId])
+                    }
+                    if (app.trackIdToPlayId.has(trackId)) {
+                        app.trackIdToPlayId.get(trackId).add(playId);
+                    } else {
+                        app.trackIdToPlayId.set(trackId, [playId])
+                    }
                     app.addAction(new UserAction(true, playId, app.idToPlayList.get(playId).name, trackId, app.idToTrack.get(trackId).name));
                     app.refreshPlayView();
                 });
@@ -271,7 +280,11 @@ var app = new Vue({
             app.userActions.push(action)
         },
         refreshPlayView: function () {
-            let trackIds = Array.from(app.playIdToTrackId.get(app.currPlayListId));
+            let tracksOrUndefined = app.playIdToTrackId.get(app.currPlayListId);
+            let trackIds = [];
+            if (tracksOrUndefined != null) {
+                trackIds = Array.from(tracksOrUndefined);
+            }
             app.currPlayListTracks = trackIds.map(i => mapSpotTrackForView(app.idToTrack.get(i)));
             if (app.tableSorter === null) {
                 app.tableSorter = new Tablesort(document.getElementById("playlistTracks"));
