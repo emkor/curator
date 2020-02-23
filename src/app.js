@@ -272,7 +272,11 @@ var app = new Vue({
             app.userActions.push(action)
         },
         refreshPlayView: function () {
-            let trackIds = Array.from(app.playIdToTrackId.get(app.currPlayListId));
+            let tracksOrUndefined = app.playIdToTrackId.get(app.currPlayListId);
+            let trackIds = [];
+            if (tracksOrUndefined != null) {
+                trackIds = Array.from(tracksOrUndefined);
+            }
             app.currPlayListTracks = trackIds.map(i => mapSpotTrackForView(app.idToTrack.get(i)));
             if (app.tableSorter === null) {
                 app.tableSorter = new Tablesort(document.getElementById("playlistTracks"));
